@@ -8,8 +8,17 @@ html, body {
 @main-color: #FF3D00;
 @main-text-color: #757575;
 @secondary-text-color: #fff;
+@header-heiht: 3rem;
 
 .vertical-align {
   display: flex;
   align-items: center;
+}
+
+.fade-enter-active, .fade-leave-active {
+  transition: opacity 0.5s;
+}
+
+.fade-enter, .fade-leave-to {
+  opacity: 0;
 }

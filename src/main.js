@@ -3,7 +3,7 @@ import App from './App.vue'
 import router from './router/router'
 import store from './store/store'
 import 'vue-awesome/icons'
-import { COLORS } from './assets/js/colors'
+import {COLORS} from './assets/js/colors'
 
 import 'vue-awesome/icons'
 
@@ -18,4 +18,5 @@ new Vue({
   router,
   store,
   render: h => h(App)
-}).$mount('#app')
+}).
+$mount('#app')

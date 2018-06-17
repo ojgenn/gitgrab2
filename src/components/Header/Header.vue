@@ -1,6 +1,6 @@
 <template>
   <div class="header">
-    <div class="header-logo">
+    <div class="header-logo" @click="goHome">
       <img src="../../assets/images/github.png" class="header-logo__image"/>
       <span class="header-logo__label">gitgrab</span>
     </div>
@@ -8,7 +8,7 @@
       <input type="text" placeholder="Введите имя" v-model="inputValue">
       <div class="header-input__icons">
         <transition name="fade">
-          <span v-on:click="inputValue = null"  v-show="inputValue">
+          <span v-on:click="inputValue = null" v-show="inputValue">
             <icon name="times"></icon>
           </span>
         </transition>
@@ -27,12 +27,17 @@
         inputValue: null
       }
     },
+    methods: {
+      goHome() {
+        this.$router.push('/')
+      }
+    },
     components: {Icon}
   }
 </script>
 
 
-<style lang="less">
+<style scoped lang="less">
   @import "../../assets/css/style";
 
   @padding-constant: 1rem;
@@ -40,7 +45,7 @@
 
   .header {
     background: @main-color;
-    height: 3rem;
+    height: @header-heiht;
     .vertical-align;
     justify-content: space-between;
   }
@@ -82,12 +87,15 @@
         }
       }
       &::placeholder {
+        font-style: italic;
         color: darken(@secondary-text-color, @color-constant);
       }
       &:-moz-placeholder {
+        font-style: italic;
         color: darken(@secondary-text-color, @color-constant);
       }
       &::-webkit-input-placeholder {
+        font-style: italic;
         color: darken(@secondary-text-color, @color-constant);
       }
     }
@@ -100,12 +108,6 @@
       display: inline;
       position: absolute;
       right: @padding-constant;
-    }
-    .fade-enter-active, .fade-leave-active {
-      transition: opacity .3s;
-    }
-    .fade-enter, .fade-leave-to {
-      opacity: 0;
     }
   }
 </style>
