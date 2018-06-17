@@ -1,13 +1,13 @@
 <template>
   <div class="home">
-    test
+    <header-view />
   </div>
 </template>
 
 <script>
-// @ is an alias to /src
-
+import HeaderView from './Header/Header.vue'
 export default {
   name: 'home',
+  components: {HeaderView}
 }
 </script>
