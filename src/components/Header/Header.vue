@@ -1,18 +1,31 @@
 <template>
-  <div class="header">
-    <div class="header-logo" @click="goHome">
-      <img src="../../assets/images/github.png" class="header-logo__image"/>
-      <span class="header-logo__label">gitgrab</span>
-    </div>
-    <div class="header-input">
-      <input type="text" placeholder="Введите имя" v-model="inputValue">
-      <div class="header-input__icons">
-        <transition name="fade">
-          <span v-on:click="inputValue = null" v-show="inputValue">
+  <div>
+    <div class="header">
+      <div class="header-logo">
+        <div v-if="showMenu" @click="sideNav = !sideNav">
+          <icon name="bars" class="header-logo__image"/>
+        </div>
+        <img src="../../assets/images/github.png" class="header-logo__image" v-else @click="goHome"/>
+        <span class="header-logo__label" @click="goHome">gitgrab</span>
+      </div>
+      <div class="header-input">
+        <input type="text" placeholder="Введите имя" v-model="inputValue" @keyup.enter="submit">
+        <div class="header-input__icons">
+          <transition name="fade">
+          <span @click="inputValue = null" v-show="inputValue">
             <icon name="times"></icon>
           </span>
-        </transition>
-        <icon name="search"></icon>
+          </transition>
+          <span @click="submit" class="header-input__icons-search">
+          <icon name="search"></icon>
+        </span>
+        </div>
+      </div>
+    </div>
+    <div v-if="showMenu && sideNav" class="side-bar">
+      <div class="side-bar__layout" @click="sideNav = !sideNav"></div>
+      <div class="side-bar__bar">
+        <side-bar position="side" :user="this.$route.params.name"/>
       </div>
     </div>
   </div>
@@ -20,19 +33,54 @@
 
 <script>
   import Icon from 'vue-awesome/components/Icon'
+  import {SET_WINDOW_SIZE} from '../../store/mutation.types'
+  import SideBar from '../Sidenavbar/Sidenavbar.vue'
 
   export default {
     data() {
       return {
-        inputValue: null
+        inputValue: null,
+        sideNav: false,
+        routerName: '',
       }
     },
     methods: {
       goHome() {
-        this.$router.push('/')
+        this.inputValue = null;
+        this.sideNav = false;
+        this.$router.push('/');
+      },
+      submit() {
+        this.sideNav = false;
+        this.$router.push(`/${this.inputValue}`)
+      },
+      handleResize() {
+        this.$store.commit(SET_WINDOW_SIZE, {
+          width: window.innerWidth,
+          height: window.innerHeight
+        })
       }
     },
-    components: {Icon}
+    computed: {
+      showMenu() {
+        return this.routerName !== 'home' && this.$store.state.window.width < 600 && this.$store.state.data
+      }
+    },
+    created: function () {
+      window.addEventListener('resize', this.handleResize);
+      this.handleResize();
+      this.routerName = this.$route.name;
+    },
+    destroyed() {
+      window.removeEventListener('resize', this.handleResize);
+    },
+    components: {Icon, SideBar},
+    watch: {
+      '$route'(to) {
+        this.sideNav = false;
+        this.routerName = to.name;
+      }
+    }
   }
 </script>
 
@@ -43,9 +91,15 @@
   @padding-constant: 1rem;
   @color-constant: 20%;
 
+  .fa-icon {
+    &:active, :hover {
+      opacity: 0.6;
+    }
+  }
+
   .header {
     background: @main-color;
-    height: @header-heiht;
+    height: @header-height;
     .vertical-align;
     justify-content: space-between;
   }
@@ -54,10 +108,18 @@
     height: 100%;
     .vertical-align;
     padding-left: @padding-constant;
+    &:hover {
+      cursor: pointer;
+    }
   }
 
   .header-logo__image {
-    height: calc(100% - @padding-constant);
+    height: calc(@header-height - @padding-constant);
+    width: calc(@header-height - @padding-constant);
+    .fa-icon {
+      height: calc(@header-height - @padding-constant);
+      width: calc(@header-height - @padding-constant);
+    }
   }
 
   .header-logo__label {
@@ -71,6 +133,11 @@
   }
 
   .header-input {
+    .fa-icon {
+      height: 0.7rem;
+      padding-right: 0.3rem;
+      padding-left: 0.3rem;
+    }
     padding-right: @padding-constant;
     input {
       display: inline-flex;
@@ -99,15 +166,42 @@
         color: darken(@secondary-text-color, @color-constant);
       }
     }
-    .fa-icon {
-      height: 0.7rem;
-      padding-right: 0.3rem;
-      padding-left: 0.3rem;
-    }
     .header-input__icons {
       display: inline;
       position: absolute;
       right: @padding-constant;
+      &:hover {
+        cursor: pointer;
+      }
+    }
+  }
+
+  .side-bar__layout {
+    display: flex;
+    background: #eeeeee;
+    opacity: 0.5;
+    filter: blur(1px);
+    position: absolute;
+    top: calc(0 - @header-height);
+    width: 100%;
+    height: calc(100vh - @header-height);
+    z-index: 50;
+  }
+
+  .side-bar__bar {
+    display: flex;
+    justify-content: center;
+    background: @main-color;
+    position: absolute;
+    top: calc(0 - @header-height);
+    width: 80%;
+    max-width: 20rem;
+    height: calc(100vh - @header-height);
+    -webkit-box-shadow: 2px 0px 2px 0px rgba(168, 168, 168, 0.75);
+    box-shadow: 2px 0px 2px 0px rgba(168, 168, 168, 0.75);
+    z-index: 999;
+    & a {
+      color: @secondary-text-color;
     }
   }
 </style>

@@ -1,16 +1,53 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
+import axios from 'axios'
+import {API_URL} from '../constanst'
+import * as types from './mutation.types'
 
 Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
-
+    data: null,
+    err: null,
+    spinner: true,
+    window: {
+      width: 0,
+      height: 0
+    }
   },
   mutations: {
-
+    [types.SET_USER](state, payload) {
+      state.err = null;
+      state.data = payload
+    },
+    [types.SET_ERR](state, payload) {
+      state.err = payload;
+      state.data = null
+    },
+    [types.SET_SPINNER](state, payload) {
+      state.spinner = payload
+    },
+    [types.SET_WINDOW_SIZE](state, payload) {
+      state.window = {
+        ...payload
+      }
+    }
   },
   actions: {
-
+    getUser({commit}, payload) {
+      commit(types.SET_SPINNER, true);
+      axios.get(`${API_URL}/users/${payload}`)
+        .then(res => {
+          console.log(res)
+          commit(types.SET_USER, res.data);
+          commit(types.SET_SPINNER, false);
+        })
+        .catch(err => {
+          console.log(err.message);
+          commit(types.SET_ERR, err.message);
+          commit(types.SET_SPINNER, false);
+        })
+    }
   }
 })

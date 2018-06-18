@@ -27,12 +27,8 @@
   @import "../assets/css/style";
 
   .home {
-    color: @main-text-color;
-    padding: 1rem;
+    .main-content;
     .vertical-align;
-    height: calc(100vh - @header-heiht - 2rem);
-    max-width: 960px;
-    margin: auto;
   }
 
   .home-content {
@@ -42,6 +38,7 @@
       display: inline-flex;
       width: 100%;
       justify-content: center;
+      text-align: center;
     }
   }
 </style>
