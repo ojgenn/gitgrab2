@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import axios from 'axios'
-import {API_URL} from '../constanst'
+import {API_URL} from '../constants'
 import * as types from './mutation.types'
 
 Vue.use(Vuex)
@@ -9,6 +9,7 @@ Vue.use(Vuex)
 export default new Vuex.Store({
   state: {
     data: null,
+    repos: [],
     err: null,
     spinner: true,
     window: {
@@ -18,15 +19,20 @@ export default new Vuex.Store({
   },
   mutations: {
     [types.SET_USER](state, payload) {
+      state.repos = [];
       state.err = null;
-      state.data = payload
+      state.data = payload;
     },
     [types.SET_ERR](state, payload) {
       state.err = payload;
-      state.data = null
+      state.data = null;
+      state.repos = [];
+    },
+    [types.SET_REPOS](state, payload) {
+      state.repos = payload;
     },
     [types.SET_SPINNER](state, payload) {
-      state.spinner = payload
+      state.spinner = payload;
     },
     [types.SET_WINDOW_SIZE](state, payload) {
       state.window = {
@@ -39,7 +45,6 @@ export default new Vuex.Store({
       commit(types.SET_SPINNER, true);
       axios.get(`${API_URL}/users/${payload}`)
         .then(res => {
-          console.log(res)
           commit(types.SET_USER, res.data);
           commit(types.SET_SPINNER, false);
         })
@@ -48,6 +53,12 @@ export default new Vuex.Store({
           commit(types.SET_ERR, err.message);
           commit(types.SET_SPINNER, false);
         })
+    },
+    getRepos({commit}, payload) {
+      axios.get(`${API_URL}/users/${payload}/repos`)
+        .then(res => {
+          commit(types.SET_REPOS, res.data);
+      })
     }
   }
 })

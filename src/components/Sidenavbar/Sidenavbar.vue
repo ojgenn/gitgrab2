@@ -1,9 +1,9 @@
 <template>
   <nav class="sidebar">
-    <img :src="$store.state.data.avatar_url" alt="avatar" class="sidebar-avatar">
+    <img :src="$store.state.data.avatar_url" alt="аватар" class="sidebar-avatar">
     <h3 class="sidebar-login">
       <a :href="`https://github.com/${$store.state.data.login}`"
-         :class="{'sidebar-login__link-main': position === 'layout', 'sidebar-list__link-side': positon !== 'layout'}">
+         :class="{'sidebar-login__link-main': position === 'layout', 'sidebar-list__link-side': position !== 'layout'}">
         {{$store.state.data.login}}
       </a>
     </h3>

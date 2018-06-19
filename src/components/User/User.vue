@@ -7,7 +7,8 @@
         <side-bar position="layout" :user="this.$route.params.name"/>
       </div>
       <div class="user-maincontent__content">
-        {{this.path }}
+        <list :data = "prepareData" v-if="path !== 'repo'" />
+        <list :data = "prepareRepo" v-if="path === 'repo'" type = "repo" :page="page"/>
       </div>
     </div>
   </div>
@@ -16,11 +17,29 @@
 <script>
   import Icon from 'vue-awesome/components/Icon'
   import SideBar from '../Sidenavbar/Sidenavbar.vue'
+  import List from '../List/List.vue'
+  import {TYPE_CHECKER} from '../../constants'
+
+  const ALLOW_RESULTS = [
+    'name',
+    'email',
+    'company',
+    'blog',
+    'bio',
+    'created_at',
+    'updated_at',
+    'followers',
+    'following',
+    'hireable',
+    'location',
+    'public_repos'
+  ];
 
   export default {
     data() {
       return {
-        path: 'info'
+        path: 'info',
+        page: 0
       }
     },
     computed: {
@@ -32,16 +51,38 @@
       },
       showSideBar() {
         return this.$store.state.window.width>600
+      },
+      prepareData() {
+        return ALLOW_RESULTS.map(item => {
+          return {value: TYPE_CHECKER(this.$store.state.data[item]), label: item.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}
+        })
+      },
+      prepareRepo() {
+        return this.$store.state.repos.map(item => {
+          return ({label: item.name, value: item})
+        });
       }
     },
-    components: {Icon, SideBar},
+    components: {Icon, SideBar, List},
     created: function () {
+      this.path = this.$route.query.path;
       this.$store.dispatch('getUser', this.$route.params.name)
+      if(this.path === 'repo') {
+        this.page = this.$route.query.page;
+        this.$store.dispatch('getRepos', this.$route.params.name)
+      }
     },
     watch: {
-      '$route'(to) {
+      '$route'(to, from) {
+        console.log(to, from)
         this.path = to.query.path;
-        this.$store.dispatch('getUser', this.$route.params.name)
+        if(to.params.name !== from.params.name){
+          this.$store.dispatch('getUser', this.$route.params.name);
+        }
+        if(this.path === 'repo') {
+          this.page = this.$route.query.page;
+          this.$store.dispatch('getRepos', this.$route.params.name)
+        }
       }
     }
   }
@@ -71,11 +112,11 @@
 
   .user-maincontent__sidebar {
     width: @sidebar-width;
+    padding-right: 1rem;
   }
 
   .user-maincontent__content {
-    width: calc(100% - @sidebar-width);
-    padding: 1rem;
+    width: 100%;
   }
 
   .sidebar {
