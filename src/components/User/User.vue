@@ -74,7 +74,6 @@
     },
     watch: {
       '$route'(to, from) {
-        console.log(to, from)
         this.path = to.query.path;
         if(to.params.name !== from.params.name){
           this.$store.dispatch('getUser', this.$route.params.name);

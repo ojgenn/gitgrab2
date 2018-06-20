@@ -15,17 +15,11 @@
       </li>
     </ul>
     <div v-if="type === 'repo'" class="list-pagination">
-      <div class="list-pagination__item" v-if="$route.query.page && $route.query.page > 1">
-        <router-link :to="'/' + $route.params.name + '?path=' + $route.query.path + '&page=' + (Number($route.query.page) - 1 )">Назад</router-link>
+      <div class="list-pagination__item" @click="list('prev')">
+        <span :class="{'list-patination__item-link': checkIfCanRoute('prev')}">Назад</span>
       </div>
-      <div class="list-pagination__item" v-if="!$route.query.page || ($route.query.page && $route.query.page <= 1)">
-        Назад
-      </div>
-      <div class="list-pagination__item" v-if="getPageNumber <= getLimit + 1">
-        <router-link :to="'/' + $route.params.name + '?path=' + $route.query.path + '&page=' + (Number(getPageNumber) + 1)">Вперед</router-link>
-      </div>
-      <div class="list-pagination__item" v-if="getPageNumber > getLimit + 1">
-        Вперед
+      <div class="list-pagination__item" @click="list('forw')">
+        <span :class="{'list-patination__item-link': checkIfCanRoute('forw')}">Вперед</span>
       </div>
     </div>
   </div>
@@ -43,6 +37,36 @@
           this.$router.push(`/${this.$route.params.name}/${val.label}`)
         }
       },
+      getPageLimit() {
+        let pageLimit;
+        if(this.data.length % ITEMS_ON_LIST > 0) {
+          pageLimit = (this.data.length - (this.data.length % ITEMS_ON_LIST))/ITEMS_ON_LIST + 1;
+        } else {
+          pageLimit = this.data.length/ITEMS_ON_LIST;
+        }
+        return pageLimit;
+      },
+      checkIfCanRoute(val) {
+        let page = 1;
+        if(this.$route.query.page) {page = Number(this.$route.query.page)}
+        let pageLimit = this.getPageLimit();
+        if(page <= 1 && val === 'prev') {return false}
+        else if (page >= pageLimit && val === 'forw') {return false}
+        else return true;
+      },
+      list (val) {
+        let page = 1;
+        if(this.$route.query.page) {page = Number(this.$route.query.page)}
+        if(this.checkIfCanRoute(val)) {
+          let to = '/' + this.$route.params.name + '?path=' + this.$route.query.path + '&page='
+          if(val === 'prev') {
+            to += page - 1
+          } else {
+            to += page + 1
+          }
+          this.$router.push(to)
+        }
+      }
     },
     computed: {
       getData() {
@@ -56,13 +80,11 @@
         }
       },
       getLimit() {
-        console.log((this.data.length / ITEMS_ON_LIST).toFixed())
-        console.log(this.data.length )
-        return (this.data.length / ITEMS_ON_LIST).toFixed();
+        return this.getPageLimit();
       },
       getPageNumber () {
         return this.$route.query.page || 1;
-      }
+      }, 
     }
   }
 </script>
@@ -128,6 +150,10 @@
     justify-content: center;
   }
   .list-pagination__item {
-    padding: 1rem
+    padding: 1rem;
+  }
+  .list-patination__item-link {
+    color: @main-color;
+    cursor: pointer;
   }
 </style>

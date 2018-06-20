@@ -49,7 +49,6 @@ export default new Vuex.Store({
           commit(types.SET_SPINNER, false);
         })
         .catch(err => {
-          console.log(err.message);
           commit(types.SET_ERR, err.message);
           commit(types.SET_SPINNER, false);
         })

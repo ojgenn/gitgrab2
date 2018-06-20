@@ -45,7 +45,6 @@
             this.error = res.message;
             this.data = null;
           } else {
-            console.log(res)
             this.error = null;
             this.data = ALLOW_RESULTS.map(item => {
               return {value: TYPE_CHECKER(res.data[item]), label: item.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}
